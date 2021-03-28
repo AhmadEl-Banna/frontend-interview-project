@@ -83,6 +83,9 @@ function generateIdGradient(id: string): string {
   return `linear-gradient(${angle}deg, rgb(${color1[0]},${color1[1]},${color1[2]}) 0%, rgb(${color2[0]},${color2[1]},${color2[2]}) 100%)`;
 }
 
+/**
+ * enum to represent the Avatar variation options
+ */
 export enum AvatarState {
   ICON = 'ICON',
   IMAGE = 'IMAGE',
@@ -92,12 +95,21 @@ export enum AvatarState {
 const AvatarContext = createContext<AvatarProps>({});
 export const AvatarContextProvider = AvatarContext.Provider;
 
+/**
+ * this function to determine if user is anonymous
+ */
 function isUserAnonymous(user?: Optional<User>): boolean {
   if (!user) return false;
   const seed =
     user.name || user.displayName || user.email || user.phoneNumber || null;
   return !seed || seed === 'anonymous';
 }
+
+/**
+ * this hook is return the AvatarContext data
+ * @throw Error if the hook is used outside of AvatarContext provider
+ * @returns @object AvatarProps
+ */
 export function useAvatarContext(): AvatarProps {
   const context = useContext(AvatarContext);
   if (!context) {
@@ -107,6 +119,12 @@ export function useAvatarContext(): AvatarProps {
   }
   return context;
 }
+/**
+ * this hook is for deciding which component will be rendered
+ * based on AvatarContext data
+ * @returns @object
+ * @type AvatarState
+ */
 export function useGetAvatarState(): AvatarState {
   const { iconKey, user, imageSrc, text } = useAvatarContext();
   if (imageSrc || (user && user.avatarUrl)) return AvatarState.IMAGE;
@@ -115,6 +133,12 @@ export function useGetAvatarState(): AvatarState {
   return AvatarState.ICON;
 }
 
+/**
+ * a hook to return the main content will be displayed on every variation of Avatar
+ * @example is case of Icon this will return icon name
+ * based on AvatarContext data
+ * @returns string
+ */
 export function useContent(): string {
   const { user, iconKey, imageSrc, text } = useAvatarContext();
   const state = useGetAvatarState();
@@ -137,6 +161,11 @@ export function useContent(): string {
   }, [user, iconKey, state, imageSrc, text]);
 }
 
+/**
+ * a hook to return the background color for all variations
+ * based on AvatarContext data
+ * @returns string
+ */
 export function useBackground(): string {
   const { color, gradientSeed, user } = useAvatarContext();
   return useMemo(() => {
